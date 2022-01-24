@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="custom_button">
+        <item name="android:background">@drawable/state_button</item>
+        <item name="android:layout_gravity">center</item>
+        <item name="android:textSize">20dp</item>
+
+    </style>
+</resources>
