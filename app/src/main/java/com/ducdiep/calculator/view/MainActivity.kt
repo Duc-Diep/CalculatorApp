@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import com.ducdiep.calculator.R
 import com.ducdiep.calculator.model.CalMethods
@@ -24,10 +25,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         supportActionBar?.hide()
-        var s1 = "723547568"
-        var s2 = "3456777"
-        var result = CalMethods.divideTwoNumber(s1,s2)
-        Log.d("abc", "onCreate: $result")
         init()
         setClick()
     }
@@ -38,10 +35,15 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             ViewModelProvider.AndroidViewModelFactory.getInstance(this.application)
         ).get(MainViewModel::class.java)
         viewModel.input.observe(this,{ t->
-            edt_input.setText(t)
+            edt_input.setText(t.toString())
         })
         viewModel.output.observe(this,{ t->
             tv_output.text = t
+        })
+        viewModel.isError.observe(this,{ t->
+            if (t){
+                Toast.makeText(this, "Error", Toast.LENGTH_SHORT).show()
+            }
         })
     }
 
@@ -49,8 +51,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         tv_history.setOnClickListener(this)
         btn_clear.setOnClickListener(this)
         btn_delete1.setOnClickListener(this)
-        btn_exponential.setOnClickListener(this)
-        btn_square2.setOnClickListener(this)
+//        btn_exponential.setOnClickListener(this)
+//        btn_square2.setOnClickListener(this)
         btn_add.setOnClickListener(this)
         btn_multi.setOnClickListener(this)
         btn_sub.setOnClickListener(this)

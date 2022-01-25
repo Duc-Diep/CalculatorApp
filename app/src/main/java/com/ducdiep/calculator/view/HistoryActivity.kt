@@ -22,7 +22,7 @@ class HistoryActivity : AppCompatActivity() {
         supportActionBar?.hide()
         sqlHelper = SQLHelper(this)
         listCal = sqlHelper.getAllCalculation()
-        calAdapter = CalculationAdapter(this, listCal)
+        calAdapter = CalculationAdapter(this, listCal.reversed())
         Log.d("list", "onCreate: $listCal, $calAdapter")
         var divider = DividerItemDecoration(this, RecyclerView.VERTICAL)
         rcv_cal.adapter = calAdapter

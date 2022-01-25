@@ -20,6 +20,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val context: Context = getApplication<Application>().applicationContext
     val input = MutableLiveData<StringBuilder>()
     val output = MutableLiveData<String>()
+    val isError = MutableLiveData<Boolean>()
     var sqlHelper: SQLHelper
 
     init {
@@ -28,48 +29,59 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun clearExpression() {
-        input.value?.clear()
+        input.value = input.value?.clear()
+        output.value = ""
     }
 
     fun deleteLast() {
         if (input.value?.length!! < 2) {
-            input.value?.clear()
+            input.value = input.value?.clear()
         } else {
             if (input.value?.last()?.isDigit()!!) {
-                input.value?.deleteCharAt(input.value?.length!! - 1)
+                input.value = input.value?.deleteCharAt(input.value?.length!! - 1)
             } else {
-                input.value?.delete(input.value?.length!! - 3, input.value?.length!!)
+                input.value = input.value?.delete(input.value?.length!! - 3, input.value?.length!!)
             }
         }
     }
 
     fun addNumber(s: String) {
-        input.value?.append(s)
+        input.value = input.value?.append(s)
+        Log.d("value", "addNumber: ${input.value}")
     }
 
     fun addOperator(s: String) {
-        if (input.value?.get(input.value?.length!! - 1)?.isDigit()!!) {
-            input.value?.append(s)
+        if (input.value?.isEmpty()!! || input.value?.get(input.value?.length!! - 1)?.isDigit()!!) {
+            input.value = input.value?.append(s)
         }
     }
 
-    fun calculate() {
-        var list: MutableList<String> = (input.value?.split(" ")) as MutableList<String>
-        Log.e("tag", list.toString())
-        var list2 = mutableListOf<String>()
-        list.forEach {
-            if (it.first() == ' ') list2.add(it.removeRange(0..0))
-            else list2.add(it)
+    private fun isError():Boolean{
+        if (input.value?.length == 0 || !input.value?.get(input.value?.length!! - 1)?.isDigit()!!){
+            return true
         }
-        Log.e("tag", input.value.toString())
+        return false
+    }
 
-        val postFix = ConvertToPostFix().convert(list2)
-        Log.e("tag", postFix.toString())
+    fun calculate() {
+        if (isError()){
+            isError.value = true
+        }else{
+            var list: MutableList<String> = (input.value?.split(" ")) as MutableList<String>
+            var list2 = mutableListOf<String>()
+            list.forEach {
+                if (it.first() == ' ') list2.add(it.removeRange(0..0))
+                else list2.add(it)
+            }
 
-        val lastResult = calculateResult(postFix)
-        val cal = Calculation(input.value.toString(), lastResult)
-        sqlHelper.addCalculation(cal)
-        output.value = lastResult
+            val postFix = ConvertToPostFix().convert(list2)
+
+            val lastResult = calculateResult(postFix)
+            val cal = Calculation(input.value.toString(), lastResult)
+            sqlHelper.addCalculation(cal)
+            output.value = lastResult
+        }
+
     }
 
 
@@ -141,4 +153,5 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
         return stack.peek().toString()
     }
+
 }

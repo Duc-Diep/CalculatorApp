@@ -26,8 +26,8 @@ class CalculationAdapter(var context:Context, var listCal:List<Calculation>):Rec
 
     override fun onBindViewHolder(holder: CalViewHolder, position: Int) {
         var cal = listCal[position]
-        holder.tvInput.text = cal.input
-        holder.tvOutput.text = cal.output
+        holder.tvInput.text = "Input: ${cal.input}"
+        holder.tvOutput.text = "Output: ${cal.output}"
         holder.itemView.setOnClickListener {
             onClick?.invoke(cal)
         }
