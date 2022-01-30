@@ -1,13 +1,60 @@
 package com.ducdiep.calculator.model
 
 import android.util.Log
+import java.lang.Exception
 
 class CalMethods {
-    companion object{
+    companion object {
+
+        fun calculateBit(n1: String, n2: String): HashMap<String, Int> {
+            val posDot1 = if (!n1.contains(".")) 0 else n1.lastIndexOf(".")
+            val posDot2 = if (!n2.contains(".")) 0 else n2.lastIndexOf(".")
+
+            val dotToEnd1 = if (posDot1 == 0) 0 else n1.length - 1 - posDot1
+            val dotToEnd2 = if (posDot2 == 0) 0 else n2.length - 1 - posDot2
+            //calcul teleBit was parse
+            val teleBitRight = Math.max(dotToEnd1, dotToEnd2)
+            //number 0 need add to equal
+            val delta1 = teleBitRight - (dotToEnd1)
+            val delta2 = teleBitRight - (dotToEnd2)
+            return hashMapOf(
+                "posDot1" to posDot1,
+                "posDot2" to posDot2,
+                "teleRight" to teleBitRight,
+                "delta1" to delta1,
+                "delta2" to delta2,
+                "dotToEnd1" to dotToEnd1,
+                "dotToEnd2" to dotToEnd2
+            )
+        }
+
         //    number1.legth>number2.legth
         fun addTwoNumber(number1: String, number2: String): String {
-            var s1 = number1
-            var s2 = number2
+
+            val cal = calculateBit(number1, number2)
+            var posDot1 = cal["posDot1"]!!
+            var posDot2 = cal["posDot2"]!!
+            var delta1 = cal["delta1"]!!
+            var delta2 = cal["delta2"]!!
+            val teleBitRight = cal["teleRight"]!!
+
+            var s1 = if (posDot1 > 0) number1.removeRange(posDot1..posDot1) else number1
+            var s2 = if (posDot2 > 0) number2.removeRange(posDot2..posDot2) else number2
+            if (delta1 > 0) {
+                repeat(delta1) {
+                    s1 += "0"
+                }
+            }
+            if (delta2 > 0) {
+                repeat(delta2) {
+                    s2 += "0"
+                }
+            }
+
+            Log.d("test", "addTwoNumber: s1= $s1, s2= $s2")
+
+
+            //add integer
             if (s1.length < s2.length) {
                 s1 = s2.also { s2 = s1 }
             }
@@ -42,14 +89,39 @@ class CalMethods {
             if (remember) {
                 result.append(1)
             }
-            return String(result.reverse())
+            Log.d("test", "addTwoNumber: teleRight $teleBitRight")
+            result.reverse()
+            if (teleBitRight > 0) result.insert(result.length - teleBitRight, ".")
+            return String(result)
         }
 
         fun subtractTwoNumber(number1: String, number2: String): String {
             if (number1 == number2) return "0"
 
-            var s1 = number1
-            var s2 = number2
+            val cal = calculateBit(number1, number2)
+            var posDot1 = cal["posDot1"]!!
+            var posDot2 = cal["posDot2"]!!
+            var delta1 = cal["delta1"]!!
+            var delta2 = cal["delta2"]!!
+            val teleBitRight = cal["teleRight"]!!
+
+
+
+            var s1 = if (posDot1 > 0) number1.removeRange(posDot1..posDot1) else number1
+            var s2 = if (posDot2 > 0) number2.removeRange(posDot2..posDot2) else number2
+            if (delta1 > 0) {
+                repeat(delta1) {
+                    s1 += "0"
+                }
+            }
+            if (delta2 > 0) {
+                repeat(delta2) {
+                    s2 += "0"
+                }
+            }
+
+
+            //subtract integer
             var sign = false
             var remember = false
 
@@ -76,10 +148,7 @@ class CalMethods {
             Log.d("result", "subtractTwoNumber: s1 = $s1, s2 = $s2, sign = $sign")
             var length1 = s1.length
             var length2 = s2.length
-            var result = ArrayList<Char>()
-            for (i in 0..length1 + 1) {
-                result.add('0')
-            }
+            var result = StringBuilder()
 
             //for s2
             for (i in 0 until length2) {
@@ -93,7 +162,7 @@ class CalMethods {
                 } else {
                     remember = false
                 }
-                result[length1 - i] = (temp + 48).toChar()
+                result.append(temp)
             }
 
             //
@@ -107,36 +176,41 @@ class CalMethods {
                 } else {
                     remember = false
                 }
-                result[length1 - length2 - i] = (temp + 48).toChar()
+                result.append(temp)
             }
 
-//      case 1000-999 = 0001
-            if (result[1] != '0' && sign) {
-                result[0] = '-';
-                result.removeLast()
-            } else if (result[1] != '0' && !sign) {
-                result.removeAt(0)
-                result.removeLast()
-            } else {
-                result[0] = '0'
-
-                while (result[0] == '0') {
-                    if (result[1] != '0' && sign) {
-                        result[0] = '-';
-                        break;
-                    }
-                    result.removeAt(0)
-                }
-                result.removeLast()
-
+            result = result.reverse()
+            if (teleBitRight > 0) result.insert(result.length - teleBitRight, ".")
+            var index = 0
+            while (index < result.length && result[index] == '0') {
+                index++
             }
-            return String(result.toCharArray())
+            if (index == result.length) return "0"
+
+            var lastResult = result.substring(index)
+            if (lastResult.startsWith(".")) {
+                lastResult = "0$lastResult"
+            }
+            if (sign) {
+                lastResult = "-$lastResult"
+            }
+            return lastResult
         }
 
         fun multiTwoNumber(number1: String, number2: String): String {
-            var s1 = number1
-            var s2 = number2
+            if (number1 == "0" || number2 == "0") return "0"
+            //
+            val cal = calculateBit(number1, number2)
+            val dot1 = cal["posDot1"]!!
+            val dot2 = cal["posDot2"]!!
+            val teleBitRight = cal["dotToEnd1"]!! + cal["dotToEnd2"]!!
+            Log.d("test", "multiTwoNumber: dottoEnd1 ${cal["dotToEnd1"]}, dottoEnd2 ${cal["dotToEnd2"]} dot1 $dot1, dot2 $dot2 telebit $teleBitRight")
+            //// remove
+            var s1 = if (dot1 > 0) number1.removeRange(dot1..dot1) else number1
+            var s2 = if (dot2 > 0) number2.removeRange(dot2..dot2) else number2
 
+
+            //multi integer
             if (s1.length < s2.length) {
                 s1 = s2.also { s2 = s1 }
             }
@@ -174,6 +248,7 @@ class CalMethods {
             while (index >= 0) {
                 result.append(temp[index--])
             }
+            if (teleBitRight > 0) result.insert(result.length - teleBitRight , ".")
             return result.toString()
         }
 
@@ -183,6 +258,40 @@ class CalMethods {
 
             if (s1 == s2) return "1"
 
+            var index = 0
+            while (index < s2.length && (s2[index] == '0' || s2[index] == '.')) {
+                index++
+            }
+
+            if (index == s2.length) {
+                throw Exception("Divide by zero")
+            }
+
+            val cal = calculateBit(number1, number2)
+            val dot1 = cal["posDot1"]!!
+            val dot2 = cal["posDot2"]!!
+            val delta1 = cal["delta1"]!!
+            val delta2 = cal["delta2"]!!
+            //
+            s1 = if (dot1 > 0) number1.removeRange(dot1..dot1) else number1
+            s2 = if (dot2 > 0) number2.removeRange(dot2..dot2) else number2
+
+            if (delta1 > 0) {
+                repeat(delta1) {
+                    s1 += "0"
+                }
+            }
+            if (delta2 > 0) {
+                repeat(delta2) {
+                    s2 += "0"
+                }
+            }
+            repeat(3) {
+                s1 += "0"
+            }
+
+
+            //divide integer
             var difference = s1.length - s2.length - 1
 
             if (difference > 0) {
@@ -194,6 +303,7 @@ class CalMethods {
                     s1 = s1.plus("0")
                 }
             }
+
             Log.d("result", "divideTwoNumber: $s1, $s2")
 
             var sub = s1
@@ -218,6 +328,16 @@ class CalMethods {
                         Log.d("result", "result: $result")
                     }
                 }
+            }
+            // Format result
+            if (result.length > 3) result =
+                result.substring(0, result.length - 3) + "." + result.substring(result.length - 3)
+            else {
+                val size = result.length
+                repeat(3 - size) {
+                    result = "0$result"
+                }
+                result = "0.$result"
             }
 
             return result

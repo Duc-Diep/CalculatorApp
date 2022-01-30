@@ -53,6 +53,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         btn_delete1.setOnClickListener(this)
 //        btn_exponential.setOnClickListener(this)
 //        btn_square2.setOnClickListener(this)
+        btn_comma.setOnClickListener(this)
         btn_add.setOnClickListener(this)
         btn_multi.setOnClickListener(this)
         btn_sub.setOnClickListener(this)
@@ -83,6 +84,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             btn_multi -> viewModel.addOperator(" × ")
             btn_sub -> viewModel.addOperator(" - ")
             btn_divide -> viewModel.addOperator(" ÷ ")
+            btn_comma -> viewModel.addOperator(".")
             btn_equal -> viewModel.calculate()
 
             btn0 -> viewModel.addNumber("0")

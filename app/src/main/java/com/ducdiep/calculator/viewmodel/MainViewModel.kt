@@ -37,7 +37,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         if (input.value?.length!! < 2) {
             input.value = input.value?.clear()
         } else {
-            if (input.value?.last()?.isDigit()!!) {
+            if (input.value?.last()?.isDigit()!!||input.value?.last() == '.') {
                 input.value = input.value?.deleteCharAt(input.value?.length!! - 1)
             } else {
                 input.value = input.value?.delete(input.value?.length!! - 3, input.value?.length!!)
@@ -51,7 +51,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun addOperator(s: String) {
-        if (input.value?.isEmpty()!! || input.value?.get(input.value?.length!! - 1)?.isDigit()!!) {
+        if (input.value?.isNotEmpty()!! && input.value?.get(input.value?.length!! - 1)?.isDigit()!!) {
             input.value = input.value?.append(s)
         }
     }

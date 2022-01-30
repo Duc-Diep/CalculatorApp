@@ -50,7 +50,6 @@ class ConvertToPostFix {
                 output.add(token)
             }
         }
-
         while (!stack.isEmpty()) {//put all operator to output
             output.add(stack.pop())
         }
